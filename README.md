@@ -59,3 +59,39 @@ Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addres
 #define PWR_BASEADDR (APB1PERIPH_BASE + 0x7000)
 ```
 
+Now, let´t build the struct that holds the peripheral register addresses.
+
+![image](https://user-images.githubusercontent.com/58916022/207079136-1765ead4-5bb6-4494-986d-f623531da0e3.png)
+![image](https://user-images.githubusercontent.com/58916022/207079270-e0bb9d7c-0dad-437e-9d5c-fc8471e19276.png)
+
+```
+*/ 
+    Peripheral register definition structure for GPIO
+*/
+typedef struct {
+	volatile uint32_t MODER; // GPIO port mode register - Address offset: 0x00
+	volatile uint32_t OTYPER; // GPIO port output type register - Address offset: 0x04
+	volatile uint32_t OSPEEDER; // GPIO port output speed register - Address offset: 0x08
+	volatile uint32_t PUPDR; // GPIO port pull-up/pull-down register - Address offset: 0x0C
+	volatile uint32_t IDR; // GPIO port input data register - Address offset: 0x10
+	volatile uint32_t ODR; // GPIO port output data register - Address offset: 0x14
+	volatile uint32_t BSRR; // GPIO port bit set/reset register - Address offset: 0x18
+	volatile uint32_t LCKR; // GPIO port configuration lock register - Address offset: 0x1C
+	volatile uint32_t AFR[2]; // GPIO alternate function low register AFR[0] = AFRL and AFR[1] = AFRH - Address offset: 0x20-0X24
+} GPIO_RegDef_t;
+```
+Using the struct that we just created, we can also create the macro peripheral definitions for the GPIOS.
+
+```
+*/ 
+    Peripheral definitions (Peripheral base addresses typecasted to xxx_RefDef_t)
+*/
+#define GPIOA ((GPIO_RefDef_t*)GPIOA_BASEADDR) 
+#define GPIOB ((GPIO_RefDef_t*)GPIOB_BASEADDR) 
+#define GPIOC ((GPIO_RefDef_t*)GPIOC_BASEADDR) 
+#define GPIOD ((GPIO_RefDef_t*)GPIOD_BASEADDR) 
+#define GPIOE ((GPIO_RefDef_t*)GPIOE_BASEADDR) 
+#define GPIOF ((GPIO_RefDef_t*)GPIOF_BASEADDR) 
+#define GPIOG ((GPIO_RefDef_t*)GPIOG_BASEADDR) 
+#define GPIOH ((GPIO_RefDef_t*)GPIOH_BASEADDR) 
+```
