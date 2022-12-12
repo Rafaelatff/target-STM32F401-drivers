@@ -1,6 +1,18 @@
 # target-STM32F401-drivers
 This project uses STM32CubeIDE and it's a program created to practice my C habilities during the course 'Mastering Microcontroller and Embedded Driver Development' from FastBit Embedded Brain Academy. I am using a NUCLEO-F401RE board.
 
+## drivers library creation
+
+Add a folder to the project with the name 'drivers'. Inside the 'drivers' folder, create 2 more folders. One with the name 'Inc' for the header files (.h) and another with the name 'Src' for the source files (.c). Then create both files in those reespectives folders (stm32f401xx.h inside 'Inc' and stm32f401xx.c inside 'Src').
+
+It is necessary to inform to the compiler the path for the 'drivers->Inc' folder. For that, right-click in the project (on the project tree), go 'Properties' -> 'C/C++ Build' -> 'Settings' -> 'Tool Settings' -> 'MCU GCC Compiler' and add the path to 'drivers->Inc'.
+
+![image](https://user-images.githubusercontent.com/58916022/207178796-0350de6b-c151-4e4f-a5fb-b5c3934841bb.png)
+
+Before leaving the settings, uncheck the option 'Exclude resource from build'.
+
+![image](https://user-images.githubusercontent.com/58916022/207180678-8917b73a-3994-4723-9d7f-dbabcce02167.png)
+
 ## Base address memories
 
 *Flash* and *SRAM* 
