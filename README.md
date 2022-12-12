@@ -99,3 +99,118 @@ Using the struct that we just created, we can also create the macro peripheral d
 #define GPIOG ((GPIO_RefDef_t*)GPIOG_BASEADDR) 
 #define GPIOH ((GPIO_RefDef_t*)GPIOH_BASEADDR) 
 ```
+
+Using the 'Table 22. RCC register map and reset values for STM32F401xB/C and STM32F401xD/E' we are going to create a new struct to use for the RCC register addresses.
+
+![image](https://user-images.githubusercontent.com/58916022/207089304-14d7a912-dd7f-4ae0-94f7-6ad1639e6341.png)
+![image](https://user-images.githubusercontent.com/58916022/207089910-f3c0a1f4-5005-4492-86ef-43d74cdfb512.png)
+![image](https://user-images.githubusercontent.com/58916022/207089994-eb3ace3a-564e-44fa-ac9e-b150cdcb7025.png)
+
+```
+*/ 
+    Peripheral register definition structure for RCC
+*/
+typedef struct {
+	volatile uint32_t CR; // RCC clock control register - Address offset: 0x00
+	volatile uint32_t PLLCFGR; // RCC PLL configuration register - Address offset: 0x04
+	volatile uint32_t CFGR; // RCC clock configuration register - Address offset: 0x08
+	volatile uint32_t CIR; // RCC clock interrupt register - Address offset: 0x0C
+	volatile uint32_t AHB1RSTR; // RCC AHB1 peripheral reset register - Address offset: 0x10
+	volatile uint32_t AHB2RSTR; // RCC AHB2 peripheral reset register - Address offset: 0x14
+	volatile uint32_t Reserved0; // Reserved - Address offset: 0x18
+	volatile uint32_t Reserved1; // Reserved - Address offset: 0x1C
+	volatile uint32_t APB1RSTR; // RCC APB1 peripheral reset register - Address offset: 0x20
+	volatile uint32_t APB2RSTR; // RCC APB2 peripheral reset register - Address offset: 0x24
+	volatile uint32_t Reserved2; // Reserved - Address offset: 0x28
+	volatile uint32_t Reserved3; // Reserved - Address offset: 0x2C
+	volatile uint32_t AHB1ENR; // RCC AHB1 peripheral clock enable register - Address offset: 0x30
+	volatile uint32_t AHB2ENR; // RCC AHB2 peripheral clock enable register - Address offset: 0x34
+	volatile uint32_t Reserved4; // Reserved - Address offset: 0x38
+	volatile uint32_t Reserved5; // Reserved - Address offset: 0x3C
+	volatile uint32_t APB1ENR; // RCC APB1 peripheral clock enable register - Address offset: 0x40
+	volatile uint32_t APB2ENR; // RCC APB2 peripheral clock enable register - Address offset: 0x44
+	volatile uint32_t Reserved6; // Reserved - Address offset: 0x48
+	volatile uint32_t Reserved7; // Reserved - Address offset: 0x4C
+	volatile uint32_t AHB1LPENR; // RCC AHB1 peripheral clock enable in low power mode register - Address offset: 0x50
+	volatile uint32_t AHB2LPENR; // RCC AHB2 peripheral clock enable in low power mode register - Address offset: 0x54
+	volatile uint32_t Reserved8; // RCC - Address offset: 0x58
+	volatile uint32_t Reserved9; // RCC - Address offset: 0x5C
+	volatile uint32_t APB1LPENR; // RCC APB1 peripheral clock enable in low power mode register - Address offset: 0x60
+	volatile uint32_t APB2LPENR; // RCC APB2 peripheral clock enable in low power mode register - Address offset: 0x64
+	volatile uint32_t Reserved10; // Reserved - Address offset: 0x68
+	volatile uint32_t Reserved11; // Reserved - Address offset: 0x6C
+	volatile uint32_t BDCR; // RCC Backup domain control register - Address offset: 0x70
+	volatile uint32_t CSR; // RCC clock control & status register - Address offset: 0x74
+	volatile uint32_t Reserved12; // Reserved - Address offset: 0x78
+	volatile uint32_t Reserved13; // Reserved - Address offset: 0x7C
+	volatile uint32_t SSCGR; // RCC spread spectrum clock generation register - Address offset: 0x80
+	volatile uint32_t PLLI2SCFGR; // RCC PLLI2S configuration register - Address offset: 0x84
+	volatile uint32_t Reserved14; // Reserved - Address offset: 0x88
+	volatile uint32_t DCKCFGR; // RCC  Dedicated Clocks Configuration Register - Address offset: 0x8C
+} RCC_RegDef_t;
+*/ 
+    Peripheral definitions (Peripheral base addresses typecasted to xxx_RefDef_t)
+*/
+#define RCC	((RCC_RegDef_t*)RCC_BASEADDR)
+```
+
+To easy the programming routines, we can create some Macro Functions to quickly initialize the peripherals. This is showed in the following command lines: 
+
+```
+// Clock Enable Macros for GPIOx peripherals
+#define GPIOA_PCLK_EN() (RCC->AHB1ENR |= (1<<0))
+#define GPIOB_PCLK_EN() (RCC->AHB1ENR |= (1<<1))
+#define GPIOC_PCLK_EN() (RCC->AHB1ENR |= (1<<2))
+#define GPIOD_PCLK_EN() (RCC->AHB1ENR |= (1<<3))
+#define GPIOE_PCLK_EN() (RCC->AHB1ENR |= (1<<4))
+
+// Clock Enable Macros for I2Cx peripherals
+#define I2C1_PCLK_EN() (RCC->APB1ENR |= (1<<21))
+#define I2C2_PCLK_EN() (RCC->APB1ENR |= (1<<22))
+#define I2C3_PCLK_EN() (RCC->APB1ENR |= (1<<23))
+
+// Clock Enable Macros for SPIx peripherals
+#define SPI1_PCLK_EN() (RCC->APB2ENR |= (1<<12))
+#define SPI2_PCLK_EN() (RCC->APB1ENR |= (1<<14))
+#define SPI3_PCLK_EN() (RCC->APB1ENR |= (1<<15))
+#define SPI4_PCLK_EN() (RCC->APB2ENR |= (1<<13))
+
+// Clock Enable Macros for UARTx/USARTx peripherals
+#define USART1_PCLK_EN() (RCC->APB2ENR |= (1<<4))
+#define USART2_PCLK_EN() (RCC->APB1ENR |= (1<<17))
+#define USART6_PCLK_EN() (RCC->APB2ENR |= (1<<5))
+
+// Clock Enable Macros for SYSCFG peripherals
+#define SYSCFG_PCLK_EN() (RCC->APB2ENR |= (1<<14))
+```
+
+The same way as showed above, we can create the clock disable macro to ease the disable of peripherals.
+
+```
+// Clock Disable Macros for GPIOx peripherals
+#define GPIOA_PCLK_DI() (RCC->AHB1ENR &= ~(1<<0))
+#define GPIOB_PCLK_DI() (RCC->AHB1ENR &= ~(1<<1))
+#define GPIOC_PCLK_DI() (RCC->AHB1ENR &= ~(1<<2))
+#define GPIOD_PCLK_DI() (RCC->AHB1ENR &= ~(1<<3))
+#define GPIOE_PCLK_DI() (RCC->AHB1ENR &= ~(1<<4))
+
+// Clock Disable Macros for I2Cx peripherals
+#define I2C1_PCLK_DI() (RCC->APB1ENR &= ~(1<<21))
+#define I2C2_PCLK_DI() (RCC->APB1ENR &= ~(1<<22))
+#define I2C3_PCLK_DI() (RCC->APB1ENR &= ~(1<<23))
+
+// Clock Disable Macros for SPIx peripherals
+#define SPI1_PCLK_DI() (RCC->APB2ENR &= ~(1<<12))
+#define SPI2_PCLK_DI() (RCC->APB1ENR &= ~(1<<14))
+#define SPI3_PCLK_DI() (RCC->APB1ENR &= ~(1<<15))
+#define SPI4_PCLK_DI() (RCC->APB2ENR &= ~(1<<13))
+
+// Clock Disable Macros for USARTx peripherals
+#define USART1_PCLK_DI() (RCC->APB2ENR &= ~(1<<4))
+#define USART2_PCLK_DI() (RCC->APB1ENR &= ~(1<<17))
+#define USART6_PCLK_DI() (RCC->APB2ENR &= ~(1<<5))
+
+// Clock Disable Macros for SYSCFG peripherals
+#define SYSCFG_PCLK_DI() (RCC->APB2ENR &= ~(1<<14))
+```
+
