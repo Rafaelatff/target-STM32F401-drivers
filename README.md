@@ -64,6 +64,10 @@ Now, let´t build the struct that holds the peripheral register addresses. For t
 ![image](https://user-images.githubusercontent.com/58916022/207079136-1765ead4-5bb6-4494-986d-f623531da0e3.png)
 ![image](https://user-images.githubusercontent.com/58916022/207079270-e0bb9d7c-0dad-437e-9d5c-fc8471e19276.png)
 
+Reminder1: To use uint32_t, we need to add #include <stdint.h>.
+Reminder2: Registers must be volatile type, since it can change without notice (eg.: GPIO port input data register).
+Reminder3: uint32_t = 32-bit = 4-bytes = +0x04 (that increases the address offset).
+
 ```
 */ 
     Peripheral register definition structure for GPIO
