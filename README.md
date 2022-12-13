@@ -226,3 +226,241 @@ The same way as showed above, we can create the clock disable macro to ease the 
 #define SYSCFG_PCLK_DI() (RCC->APB2ENR &= ~(1<<14))
 ```
 
+Inside the stm32f401xx.h file, we can create some macros that will be used along the drivers (diffent .h files). Such as:
+
+```
+// Some generic macros
+#define ENABLE 1
+#define DISABLE 0
+#define SET ENABLE
+#define RESET DISABLE
+#define GPIO_PIN_SET SET
+```
+
+We can create a stm32f401xx_GPIO_driver.h file, to list all the related GPIO macros, structs and funcions, being:
+
+```
+//@GPIO_PIN_NUMBERS
+#define GPIO_PIN_NO_0 0 
+#define GPIO_PIN_NO_1 1 
+#define GPIO_PIN_NO_2 2 
+#define GPIO_PIN_NO_3 3 
+#define GPIO_PIN_NO_4 4 
+#define GPIO_PIN_NO_5 5 
+#define GPIO_PIN_NO_6 6 
+#define GPIO_PIN_NO_7 7 
+#define GPIO_PIN_NO_8 8 
+#define GPIO_PIN_NO_9 9 
+#define GPIO_PIN_NO_10 10 
+#define GPIO_PIN_NO_11 11 
+#define GPIO_PIN_NO_12 12 
+#define GPIO_PIN_NO_13 13 
+#define GPIO_PIN_NO_14 14 
+#define GPIO_PIN_NO_15 15 
+
+//@GPIO_PIN_MODES
+#define GPIO_MODE_IN 0
+#define GPIO_MODE_OUT 1
+#define GPIO_MODE_ALTFN 2
+#define GPIO_MODE_ANALOG 3 // value equal or less than 3 = non interrupt modes
+#define GPIO_MODE_IT_FT 4 //interruptt falling edge trigger
+#define GPIO_MODE_IT_RT 5 //input rising edge trigger
+#define GPIO_MODE_IT_RFT 6 //input rising/falling edge trigger
+
+//GPIO pin possible output types
+#define GPIO_OP_TYPE_PP 0 // push pull
+#define GPIO_OP_TYPE_OD 1 // open drain
+
+//GPIO pin possible output speeds
+//@GPIO_PIN_SPEEDS
+#define GPIO_SPEED_LOW 0
+#define GPIO_SPEED_MEDIUM 1
+#define GPIO_SPEED_FAST 2
+#define GPIO_SPEED_HIGH 3
+
+//GPIO pin possible pull up and down
+#define GPIO_NO_PUPD 0
+#define GPIO_PIN_PU 1
+#define GPIO_PIN_PD 2
+
+typedef struct{
+	uint8_t GPIO_PinNumber; //@GPIO_PIN_NUMBERS
+	uint8_t GPIO_PinMode; // possible valyes from @GPIO_PIN_MODES
+	uint8_t GPIO_PinSpeed; //@GPIO_PIN_SPEEDS
+	uint8_t GPIO_PinPuPdControl;
+	uint8_t GPIO_PinOpType;
+	uint8_t GPIO_PinAltFunMode;
+}GPIO_PinConfig_t;
+
+typedef struct{
+	GPIO_RefDef_t *pGPIOx; //Holds the base addess of the GPIO port
+	GPIO_PinConfig_t GPIO_PinConfig; //Holds the GPIO pin config. settings
+}GPIO_Handle_t;
+
+// APIs supported by this driver
+//Peripheral clock setup
+void GPIO_PeriClkCtrl(GPIO_RefDef_t *pGPIOx, uint8_t EnOrDi);
+
+// Initi and De-init
+void GPIO_Init(GPIO_Handle_t);
+void GPIO_DeInit(GPIO_RefDef_t *pGPIOx);
+
+// Data read and write
+uint8_t GPIO_Read(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber); //It also could be a boolean
+uint16_t GPIO_PortRead(GPIO_RefDef_t *pGPIOx); // returns te port value
+void GPIO_Out(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value); //value can be SET or RESET
+void GPIO_PortOut(GPIO_RefDef_t *pGPIOx, uint16_t Value);
+void GPIO_Toggle(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber);
+
+// IRQ handling
+void GPIO_IRQConfig(uint8_t ORQNumber, uint8_t IRQPriority, uint8_t EnOrDi);
+void GPIO_IRQHandling(uint8_t GPIO_PinNumber);
+```
+
+
+
+And in the source file (stm32f401xx_GPIO_driver.c), we can copy those same functions (not the structs, only the functions) and open to statements. For every function, it is important to write a small header to explain its functions. We can use @ for the parameters and stuff.
+
+**@fn** = functio name
+
+**@brief** = a brief of what this function does
+
+**@param** = parameter descriptions - base addres of GPIO 
+
+				- macros ENABLE DISABLE
+				
+**@return** = expected return value for this function (none if void)
+
+**@note** = especial note
+
+And we can start to write the functions. Let´s begin with the configuration of peripheral clock control.
+
+```
+/* 
+	write the header for the following function
+*/
+void GPIO_PeriClkCtrl(GPIO_RefDef_t *pGPIOx, uint8_t EnOrDi){
+	if (EnOrDi == ENABLE){
+		if(pGPIOx == GPIOA){
+			GPIOA_PCLK_EN();
+		} else if (pGPIOx == GPIOB){
+			GPIOB_PCLK_EN();
+		} else if (pGPIOx == GPIOC){
+			GPIOC_PCLK_EN();
+		} else if (pGPIOx == GPIOD){
+			GPIOD_PCLK_EN();
+		} else if (pGPIOx == GPIOE){
+			GPIOE_PCLK_EN();
+		}
+	}else{
+		if(pGPIOx == GPIOA){
+			GPIOA_PCLK_DI();
+		} else if (pGPIOx == GPIOB){
+			GPIOB_PCLK_DI();
+		} else if (pGPIOx == GPIOC){
+			GPIOC_PCLK_DI();
+		} else if (pGPIOx == GPIOD){
+			GPIOD_PCLK_DI();
+		} else if (pGPIOx == GPIOE){
+			GPIOE_PCLK_DI();
+		}
+	}
+}
+```
+The following function, initializes the GPIO pin.
+
+```
+void GPIO_Init(GPIO_Handle t *pGPIOHandle){
+	uint32_t temp =0; // temp. register
+
+	// 1 Configure the mode of GPIO pin
+	if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG){
+		// value equal or less than 3 = non interrupt modes
+		temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+		// 2* pois são 2 bits o MODER
+		pGPIOHandle->pGPIOx->MODER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //Clear bit fields bf setting new value
+		pGPIOHandle->pGPIOx->MODER |= temp;
+	}else{
+	
+	}
+	temp=0;
+
+	// 2 Configure Speed
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+	pGPIOHandle->pGPIOx->OSPEEDER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //Clear bit fields bf setting new value
+	pGPIOHandle->pGPIOx->OSPEEDER |= temp;
+
+	temp=0;
+
+	// 3 Configure the pupd settings
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControll << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+	pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //Clear bit fields bf setting new value
+	pGPIOHandle->pGPIOx->PUPDR |= temp;
+
+	temp=0;
+
+	// 4 Configure the OPTYPE
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+	pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //Clear bit fields bf setting new value
+	pGPIOHandle->pGPIOx->OTYPER |= temp;
+
+	temp=0;
+
+	// 5 Configure the alt functionality
+	if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_ALTFN){
+		uint8_t temp1, temp2;
+
+		temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber /8; 
+		//temp1 will find the which AFR to use ([0] or [1]) by: 
+		//number less than 0 = [0] .. pin 0 to 7 /8 is equal to 0.?
+		//number bigger than 1 = [1] .. pin 8 to 16 /8 is equal to 1.? or 2
+		temp2 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber %8;
+		//temp2 will find out the number of the field position (pin) by taking the mod by 8
+		// 0 mod 8 = 0, 1 mod 8 = 1, 2 mod 8 = 2, 3 mod 8 = 3 ... 7 mod 8 = 7
+		// 8 mod 8 = 0, 9 mod 8 = 1, 10 mod 8 = 2, 11 mod 8 = 3 ... 15 mod 8 = 7
+		pGPIOHandle->pGPIOx->AFR[temp1] &= ~(0xF << (4 * temp2)); //Clear bit
+		pGPIOHandle->pGPIOx->AFR[temp1] |= (pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFunMode << (4 * temp2));
+		//AFRL/AFRH uses 4 bit position to configure each pin, so 4 bits must be set (4*)
+	}
+```
+We also need to be able of resetting the port configuration. Observe that the reset function works on the entire port, not being able to reset a single pin.
+
+```
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx){
+	if(pGPIOx == GPIOA){
+		GPIOA_REG_RESET();
+	} else if (pGPIOx == GPIOB){
+		GPIOB_REG_RESET();
+	} else if (pGPIOx == GPIOC){
+		GPIOC_REG_RESET();
+	} else if (pGPIOx == GPIOD){
+		GPIOD_REG_RESET();
+	} else if (pGPIOx == GPIOE){
+		GPIOF_REG_RESET();
+	} else if (pGPIOx == GPIOH){
+		GPIOH_REG_RESET();
+	}
+}
+```
+Then, at the stm32f401xx.h file we can create some macros that will do the reset configuration. Note that we are not creating those macros inside the stm32f401xx_GPIO_driver.h file, that is because RCC_AHB1RSTR registers have different peripherals than GPIOs and need to be accessed for all the others different drivers.
+
+To assist us with the shift bitwise operator, an image of the Reset and Clock Control AHB1 peripheral reset register from RM0368 Reference Manual.
+
+![image](https://user-images.githubusercontent.com/58916022/207433773-6b2f29f6-0adc-422b-ae20-b0817c0c21a3.png)
+
+To reset the port, the value must go to 1 (being set) and then must return to 0 (or it will stay in reset mode);
+
+![image](https://user-images.githubusercontent.com/58916022/207434198-92ac033a-e375-481e-ac39-8d404cf07c33.png)
+
+```
+#define GPIOA_REG_RESET() do { (RCC->AHB1RSTR |= (1<<0)); (RCC->AHB1RSTR &= ~(1<<0)); } while(0)
+#define GPIOB_REG_RESET() do { (RCC->AHB1RSTR |= (1<<1)); (RCC->AHB1RSTR &= ~(1<<1)); } while(0)
+#define GPIOC_REG_RESET() do { (RCC->AHB1RSTR |= (1<<2)); (RCC->AHB1RSTR &= ~(1<<2)); } while(0)
+#define GPIOD_REG_RESET() do { (RCC->AHB1RSTR |= (1<<3)); (RCC->AHB1RSTR &= ~(1<<3)); } while(0)
+#define GPIOE_REG_RESET() do { (RCC->AHB1RSTR |= (1<<4)); (RCC->AHB1RSTR &= ~(1<<4)); } while(0)
+#define GPIOH_REG_RESET() do { (RCC->AHB1RSTR |= (1<<7)); (RCC->AHB1RSTR &= ~(1<<7)); } while(0)
+
+```
+
+
+
