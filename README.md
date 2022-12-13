@@ -462,5 +462,48 @@ To reset the port, the value must go to 1 (being set) and then must return to 0 
 
 ```
 
+PAREI AQUI: 
+Quando implementar, checar nome das funções, explicar e comentar o que for necessário:
 
+Reading functions
 
+```
+//Reading functions
+
+uint8_t GPIO_ReadFromInputPin (GPIO_RefDeg_t *pGPIOx, uint8_t PinNumber){
+	uint8_t value;
+	// shift value 'Pin Number' times to the right, so it's possible to simple mask and then read LSB
+	value = (uint8_t)(pGPIOx->IDR >> PinNumber) & 0x00000001);
+	return value; // @return = return value can be 0 o 1
+}
+
+uint16_t GPIO_ReadFromInputPin (GPIO_RefDeg_t *pGPIOx){
+	uint16_t value;
+	value = (uint16_t)pGPIOx->IDR;
+	return value; // @return = return value can be 0 to 0xFFFF
+}
+```
+
+Writting functions
+
+```
+// Writting functions
+
+void GPIO_Out(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value){
+ //value can be SET or RESET
+	if(Value == GPIO_PIN_SET){
+		//Write 1 to the output data reguster at the bit field corresponding to the pin
+		pGPIOx->ODR |= (1 << PinNumber);
+	}else{
+		pGPIOx->ODR &= ~(1 << PinNumber);
+	}
+}
+
+void GPIO_PortOut(GPIO_RefDef_t *pGPIOx, uint16_t Value){
+	pGPIOx->ODR = Value;
+}
+
+void GPIO_Toggle(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber){
+	pGPIOx->ODR ^= (1 << PinNumber);
+}
+```
