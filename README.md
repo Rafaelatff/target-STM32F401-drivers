@@ -161,7 +161,7 @@ typedef struct {
 	volatile uint32_t DCKCFGR; // RCC  Dedicated Clocks Configuration Register - Address offset: 0x8C
 } RCC_RegDef_t;
 */ 
-    Peripheral definitions (Peripheral base addresses typecasted to xxx_RefDef_t)
+    Peripheral definitions (Peripheral base addresses typecasted to xxx_RegDef_t)
 */
 #define RCC	((RCC_RegDef_t*)RCC_BASEADDR)
 ```
