@@ -599,6 +599,101 @@ int main (void){
 }
 ```
 
+## Case 2 - 002led_toogle.c (Open Drain config)
+
+To configure as Open Drain, it is need just to change the 'GPIO_PinOpType' to 'GPIO_OP_TYPE_OD'.
+
+After compiling and running the code, the LD2 won't blink. That is because that in Open Drain configuration, the output will be only Low level (0 or GND) or Open. It won't be connected to VCC in any moment. You can connect an external pull-up resistor, or configurate the internal.
+
+To configure the internal pull-up resistor, just change the 'GPIO_PinPuPdControl' to 'GPIO_PIN_PU'. Notice that the LD2 will blink very weak. That is because of the value of the internal pull-up resistor. We can check its value in the datasheet of the selected microcontroller.
+
+![image](https://user-images.githubusercontent.com/58916022/208123463-2ea6ad0d-cf50-4752-8911-1e66c2862a13.png)
+
+Final code:
+```
+#include "stm32f401xx.h"
+
+void delay(void){
+	for (uint32_t i=0; i<500000; i++);
+}
+
+int main (void){
+	GPIO_Handle_t LD2; // LD2 connected to GPIO A (port A) and pin 5
+
+	LD2.pGPIOx = GPIOA;
+	LD2.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_5;
+	LD2.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_OUT;
+	LD2.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	LD2.GPIO_PinConfig.GPIO_PinOpType = GPIO_OP_TYPE_OD; //config. as Open Drain
+	LD2.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU; //40k internal res.
+
+	GPIO_PeriClkCtrl(GPIOA, ENABLE);
+	GPIO_Init(&LD2);
+
+	while (1){
+		GPIO_Toggle(GPIOA,GPIO_PIN_NO_5);
+		delay();
+	}
+}
+```
+
+## Case 3 - 003button_toogle.c 
+
+Final code:
+
+```
+//LD2 = PA5
+//B1 = PC13 with pull-up resistor
+#include "stm32f401xx.h"
+
+#define LOW 0
+#define BTN_PRESSED LOW
+
+void delay(void){
+	for (uint32_t i=0; i<400000; i++);
+}
+
+int main (void){
+	GPIO_Handle_t LD2, B1; // LD2 connected to GPIO A (port A) and pin 5
+
+	//LD2 configuration
+	LD2.pGPIOx = GPIOA;
+	LD2.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_5;
+	LD2.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_OUT;
+	LD2.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	LD2.GPIO_PinConfig.GPIO_PinOpType = GPIO_OP_TYPE_PP;
+	LD2.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	//No need of config. PUPD since it's already PP (push pull)
+
+	//B1 configuration
+	B1.pGPIOx = GPIOC;
+	B1.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_13;
+	B1.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+	B1.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	B1.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD; //It has an external PU
+
+
+	GPIO_PeriClkCtrl(GPIOA, ENABLE);
+	GPIO_PeriClkCtrl(GPIOC, ENABLE);
+	GPIO_Init(&LD2);
+	GPIO_Init(&B1);
+
+	while (1){
+		if(GPIO_Read(GPIOC, GPIO_PIN_NO_13)==BTN_PRESSED){
+			delay(); //to minimize deboung effect of button
+			GPIO_Toggle(GPIOA,GPIO_PIN_NO_5);
+
+		}
+	}
+}
+```
+
+Results:
+
+![WhatsApp Video 2022-12-16 at 12 20 42](https://user-images.githubusercontent.com/58916022/208131376-cd4e89f8-dc49-4ece-8286-c2ce0ae2273d.gif)
+
+
+
 
 
 
