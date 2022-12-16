@@ -44,7 +44,39 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 #define AHB1PERIPH_BASE 0x40020000UL
 #define AHB2PERIPH_BASE 0x50000000UL
 ```
+Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on AHB2 bus.
 
+```
+/*
+    Base addresses of peripherals which are hanging on AHB2 bus
+*/
+```
+Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on AHB1 bus.
+
+```
+/*
+    Base addresses of peripherals which are hanging on AHB1 bus
+*/
+#define GPIOA_BASEADDR (AHB1PERIPH_BASE + 0x0000)
+#define GPIOB_BASEADDR (AHB1PERIPH_BASE + 0x0400)
+#define GPIOC_BASEADDR (AHB1PERIPH_BASE + 0x0800)
+#define GPIOD_BASEADDR (AHB1PERIPH_BASE + 0x0C00)
+#define GPIOE_BASEADDR (AHB1PERIPH_BASE + 0x1000)
+#define GPIOH_BASEADDR (AHB1PERIPH_BASE + 0x1C00)
+#define CRC_BASEADDR (AHB1PERIPH_BASE + 0x3000)
+#define RCC_BASEADDR (AHB1PERIPH_BASE + 0x3800)
+#define FIR_BASEADDR (AHB1PERIPH_BASE + 0x3C00)
+#define DMA1_BASEADDR (AHB1PERIPH_BASE + 0x6000)
+#define DMA2_BASEADDR (AHB1PERIPH_BASE + 0x6400)
+#define USB_OTG_FS_BASEADDR (AHB1PERIPH_BASE + 0xFFE0000)
+```
+Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on APB2 bus.
+
+```
+/*
+    Base addresses of peripherals which are hanging on APB2 bus
+*/
+```
 Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on APB1 bus.
 
 ```
