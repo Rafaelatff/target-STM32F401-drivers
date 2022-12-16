@@ -425,14 +425,14 @@ void GPIO_Init(GPIO_Handle t *pGPIOHandle){
 	temp=0;
 
 	// 3 Configure the pupd settings
-	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControll << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControl << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //Clear bit fields bf setting new value
 	pGPIOHandle->pGPIOx->PUPDR |= temp;
 
 	temp=0;
 
 	// 4 Configure the OPTYPE
-	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOpType << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
 	pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //Clear bit fields bf setting new value
 	pGPIOHandle->pGPIOx->OTYPER |= temp;
 
@@ -454,6 +454,7 @@ void GPIO_Init(GPIO_Handle t *pGPIOHandle){
 		pGPIOHandle->pGPIOx->AFR[temp1] |= (pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFunMode << (4 * temp2));
 		//AFRL/AFRH uses 4 bit position to configure each pin, so 4 bits must be set (4*)
 	}
+}
 ```
 We also need to be able of resetting the port configuration. Observe that the reset function works on the entire port, not being able to reset a single pin.
 
