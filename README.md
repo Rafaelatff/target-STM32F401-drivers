@@ -20,7 +20,7 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 ![image](https://user-images.githubusercontent.com/58916022/207028999-ce0e94d8-f434-4550-9434-68cc9c43ddee.png)
 
 ```
-*/ 
+/*
     Base addresses of Flash and SRAM memories
 */
 #define FLASH_BASEADDR	0x08000000UL //typecast also would work (uint32_t) isntead of UL
@@ -35,7 +35,7 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 ![image](https://user-images.githubusercontent.com/58916022/207036881-ced6d2fd-f7ef-4bac-a224-4d4178f21d7f.png)
 
 ```
-*/ 
+/*
     Base addresses of AHBx and APBx Bus Peripheral
 */
 #define PERIPH_BASE	0x40000000UL
@@ -48,7 +48,7 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on APB1 bus.
 
 ```
-*/ 
+/*
     Base addresses of peripherals which are hanging on APB1 bus
 */
 #define TIM2_BASEADDR (APB1PERIPH_BASE + 0x0000)
@@ -81,7 +81,7 @@ Reminder2: Registers must be volatile type, since it can change without notice (
 Reminder3: uint32_t = 32-bit = 4-bytes = +0x04 (that increases the address offset).
 
 ```
-*/ 
+/*
     Peripheral register definition structure for GPIO
 */
 typedef struct {
@@ -99,17 +99,17 @@ typedef struct {
 Using the struct that we just created, we can also create the macro peripheral definitions for the GPIOS.
 
 ```
-*/ 
-    Peripheral definitions (Peripheral base addresses typecasted to xxx_RefDef_t)
+/*
+    Peripheral definitions (Peripheral base addresses typecasted to xxx_RegDef_t)
 */
-#define GPIOA ((GPIO_RefDef_t*)GPIOA_BASEADDR) 
-#define GPIOB ((GPIO_RefDef_t*)GPIOB_BASEADDR) 
-#define GPIOC ((GPIO_RefDef_t*)GPIOC_BASEADDR) 
-#define GPIOD ((GPIO_RefDef_t*)GPIOD_BASEADDR) 
-#define GPIOE ((GPIO_RefDef_t*)GPIOE_BASEADDR) 
-#define GPIOF ((GPIO_RefDef_t*)GPIOF_BASEADDR) 
-#define GPIOG ((GPIO_RefDef_t*)GPIOG_BASEADDR) 
-#define GPIOH ((GPIO_RefDef_t*)GPIOH_BASEADDR) 
+#define GPIOA ((GPIO_RegDef_t*)GPIOA_BASEADDR) 
+#define GPIOB ((GPIO_RegDef_t*)GPIOB_BASEADDR) 
+#define GPIOC ((GPIO_RegDef_t*)GPIOC_BASEADDR) 
+#define GPIOD ((GPIO_RegDef_t*)GPIOD_BASEADDR) 
+#define GPIOE ((GPIO_RegDef_t*)GPIOE_BASEADDR) 
+#define GPIOF ((GPIO_RegDef_t*)GPIOF_BASEADDR) 
+#define GPIOG ((GPIO_RegDef_t*)GPIOG_BASEADDR) 
+#define GPIOH ((GPIO_RegDef_t*)GPIOH_BASEADDR) 
 ```
 
 Using the 'Table 22. RCC register map and reset values for STM32F401xB/C and STM32F401xD/E' we are going to create a new struct to use for the RCC register addresses.
@@ -119,7 +119,7 @@ Using the 'Table 22. RCC register map and reset values for STM32F401xB/C and STM
 ![image](https://user-images.githubusercontent.com/58916022/207089994-eb3ace3a-564e-44fa-ac9e-b150cdcb7025.png)
 
 ```
-*/ 
+/* 
     Peripheral register definition structure for RCC
 */
 typedef struct {
@@ -293,24 +293,24 @@ typedef struct{
 }GPIO_PinConfig_t;
 
 typedef struct{
-	GPIO_RefDef_t *pGPIOx; //Holds the base addess of the GPIO port
+	GPIO_RegDef_t *pGPIOx; //Holds the base addess of the GPIO port
 	GPIO_PinConfig_t GPIO_PinConfig; //Holds the GPIO pin config. settings
 }GPIO_Handle_t;
 
 // APIs supported by this driver
 //Peripheral clock setup
-void GPIO_PeriClkCtrl(GPIO_RefDef_t *pGPIOx, uint8_t EnOrDi);
+void GPIO_PeriClkCtrl(GPIO_RegDef_t *pGPIOx, uint8_t EnOrDi);
 
 // Initi and De-init
 void GPIO_Init(GPIO_Handle_t);
-void GPIO_DeInit(GPIO_RefDef_t *pGPIOx);
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx);
 
 // Data read and write
-uint8_t GPIO_Read(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber); //It also could be a boolean
-uint16_t GPIO_PortRead(GPIO_RefDef_t *pGPIOx); // returns te port value
-void GPIO_Out(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value); //value can be SET or RESET
-void GPIO_PortOut(GPIO_RefDef_t *pGPIOx, uint16_t Value);
-void GPIO_Toggle(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber);
+uint8_t GPIO_Read(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber); //It also could be a boolean
+uint16_t GPIO_PortRead(GPIO_RegDef_t *pGPIOx); // returns te port value
+void GPIO_Out(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber, uint8_t Value); //value can be SET or RESET
+void GPIO_PortOut(GPIO_RegDef_t *pGPIOx, uint16_t Value);
+void GPIO_Toggle(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber);
 
 // IRQ handling
 void GPIO_IRQConfig(uint8_t ORQNumber, uint8_t IRQPriority, uint8_t EnOrDi);
@@ -339,7 +339,7 @@ And we can start to write the functions. Let´s begin with the configuration of 
 /* 
 	write the header for the following function
 */
-void GPIO_PeriClkCtrl(GPIO_RefDef_t *pGPIOx, uint8_t EnOrDi){
+void GPIO_PeriClkCtrl(GPIO_RegDef_t *pGPIOx, uint8_t EnOrDi){
 	if (EnOrDi == ENABLE){
 		if(pGPIOx == GPIOA){
 			GPIOA_PCLK_EN();
@@ -470,14 +470,14 @@ Reading functions
 ```
 //Reading functions
 
-uint8_t GPIO_ReadFromInputPin (GPIO_RefDeg_t *pGPIOx, uint8_t PinNumber){
+uint8_t GPIO_Read (GPIO_RegDef_t *pGPIOx, uint8_t PinNumber){
 	uint8_t value;
 	// shift value 'Pin Number' times to the right, so it's possible to simple mask and then read LSB
-	value = (uint8_t)(pGPIOx->IDR >> PinNumber) & 0x00000001);
+	value = ((uint8_t)(pGPIOx->IDR >> PinNumber) & 0x00000001);
 	return value; // @return = return value can be 0 o 1
 }
 
-uint16_t GPIO_ReadFromInputPin (GPIO_RefDeg_t *pGPIOx){
+uint16_t GPIO_PortRead (GPIO_RegDef_t *pGPIOx){
 	uint16_t value;
 	value = (uint16_t)pGPIOx->IDR;
 	return value; // @return = return value can be 0 to 0xFFFF
@@ -489,7 +489,7 @@ Writting functions
 ```
 // Writting functions
 
-void GPIO_Out(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value){
+void GPIO_Out(GPIO_RegDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value){
  //value can be SET or RESET
 	if(Value == GPIO_PIN_SET){
 		//Write 1 to the output data reguster at the bit field corresponding to the pin
@@ -499,11 +499,11 @@ void GPIO_Out(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value){
 	}
 }
 
-void GPIO_PortOut(GPIO_RefDef_t *pGPIOx, uint16_t Value){
+void GPIO_PortOut(GPIO_RegDef_t *pGPIOx, uint16_t Value){
 	pGPIOx->ODR = Value;
 }
 
-void GPIO_Toggle(GPIO_RefDef_t *pGPIOx, uint8_t GPIO_PinNumber){
+void GPIO_Toggle(GPIO_RegDef_t *pGPIOx, uint8_t GPIO_PinNumber){
 	pGPIOx->ODR ^= (1 << PinNumber);
 }
 ```
