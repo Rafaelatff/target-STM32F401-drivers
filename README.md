@@ -540,3 +540,65 @@ void GPIO_Toggle(GPIO_RegDef_t *pGPIOx, uint8_t GPIO_PinNumber){
 	pGPIOx->ODR ^= (1 << PinNumber);
 }
 ```
+
+# Testing drivers
+
+## Case 1 - 001led_toogle.c (Push pull config)
+
+Delete the main.c file and let's create a new source file int the main 'Src' source folder. 
+
+Note that, when writting the code, always that you are using a variable with struct type, after writting the name of this variable, at the moment you write the dot '.', the IDE presents you with the possible inputs available. In the case of a 'GPIO_Handle_t', its possible to edit the '*pGPIOx' (that holds the base address of the GPIO port), or the 'GPIO_PinConfig' (that holds the GPIO pin config. settings).
+
+![image](https://user-images.githubusercontent.com/58916022/208116152-0c8364f9-a32d-4fdd-a293-3c9c4191bc5c.png)
+
+Since you have netsted structures, you can enter the value of a struct that is inside another struct. You can see that in the next image, where is being configured the 'GPIO_PinConfig' of the 'GPIO_PinNumber'.
+
+![image](https://user-images.githubusercontent.com/58916022/208117659-e1b59953-805e-4139-a79c-12c45d57c46c.png)
+
+Just to help remembering, we have those structs:
+
+![image](https://user-images.githubusercontent.com/58916022/208118259-741b8b48-637c-477f-9591-5a620decd5d2.png)
+
+To get the auto suggestions in eclipse, you have to press and hold the left CTRL key and then press the SPACE key. Remember that if is something that you need from stm32f401xx_gpio_driver.h, you must include the file in the document. Since after the creating of all the drivers we are going to have a lot of '.h' files. We can simply add the #include "stm32f401xx_gpio_driver.h" line inside the #include "stm32f401xx.h".
+
+![image](https://user-images.githubusercontent.com/58916022/208118901-f7c09983-6d74-4797-99d4-3473aaeefa0c.png)
+
+Same thing happens when you are writting a function. It's really helpful since the auto suggestions shows, at the moment you are writting, the syntax of that functions.
+
+![image](https://user-images.githubusercontent.com/58916022/208120652-a5c57901-5329-4981-8fb1-1867ca278f5d.png)
+
+![image](https://user-images.githubusercontent.com/58916022/208120836-0aa5c45a-9eb6-4099-a9c8-27c9c549b202.png)
+
+Final code:
+
+```
+#include "stm32f401xx.h"
+
+void delay(void){
+	for (uint32_t i=0; i<500000; i++);
+}
+
+int main (void){
+	GPIO_Handle_t LD2; // LD2 connected to GPIO A (port A) and pin 5
+
+	LD2.pGPIOx = GPIOA;
+	LD2.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_5;
+	LD2.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_OUT;
+	LD2.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	LD2.GPIO_PinConfig.GPIO_PinOpType = GPIO_OP_TYPE_PP;
+	LD2.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	//No need of config. PUPD since it's already PP (push pull)
+
+	GPIO_PeriClkCtrl(GPIOA, ENABLE);
+	GPIO_Init(&LD2);
+
+	while (1){
+		GPIO_Toggle(GPIOA,GPIO_PIN_NO_5);
+		delay();
+	}
+}
+```
+
+
+
+
