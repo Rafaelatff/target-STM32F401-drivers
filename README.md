@@ -334,7 +334,7 @@ typedef struct{
 void GPIO_PeriClkCtrl(GPIO_RegDef_t *pGPIOx, uint8_t EnOrDi);
 
 // Initi and De-init
-void GPIO_Init(GPIO_Handle_t);
+void GPIO_Init(GPIO_Handle_t *pGPIOHandle);
 void GPIO_DeInit(GPIO_RegDef_t *pGPIOx);
 
 // Data read and write
