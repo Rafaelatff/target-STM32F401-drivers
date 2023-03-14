@@ -19,7 +19,7 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 
 ![image](https://user-images.githubusercontent.com/58916022/207028999-ce0e94d8-f434-4550-9434-68cc9c43ddee.png)
 
-```
+```c
 /*
     Base addresses of Flash and SRAM memories
 */
@@ -34,7 +34,7 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 ![image](https://user-images.githubusercontent.com/58916022/207036964-8ee3715f-3105-4ae4-8ffa-afa8a187ddef.png)
 ![image](https://user-images.githubusercontent.com/58916022/207036881-ced6d2fd-f7ef-4bac-a224-4d4178f21d7f.png)
 
-```
+```c
 /*
     Base addresses of AHBx and APBx Bus Peripheral
 */
@@ -46,14 +46,14 @@ Before leaving the settings, uncheck the option 'Exclude resource from build'.
 ```
 Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on AHB2 bus.
 
-```
+```c
 /*
     Base addresses of peripherals which are hanging on AHB2 bus
 */
 ```
 Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on AHB1 bus.
 
-```
+```c
 /*
     Base addresses of peripherals which are hanging on AHB1 bus
 */
@@ -72,14 +72,14 @@ Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addres
 ```
 Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on APB2 bus.
 
-```
+```c
 /*
     Base addresses of peripherals which are hanging on APB2 bus
 */
 ```
 Following the 'Table 1. STM32F401xB/C and STM32F401xD/E register boundary addresses' of the Reference Manual (RM0368), it is possible to get the peripheral addresses for the peripheral hanging on APB1 bus.
 
-```
+```c
 /*
     Base addresses of peripherals which are hanging on APB1 bus
 */
@@ -112,7 +112,7 @@ Reminder1: To use uint32_t, we need to add #include <stdint.h>.
 Reminder2: Registers must be volatile type, since it can change without notice (eg.: GPIO port input data register).
 Reminder3: uint32_t = 32-bit = 4-bytes = +0x04 (that increases the address offset).
 
-```
+```c
 /*
     Peripheral register definition structure for GPIO
 */
@@ -130,7 +130,7 @@ typedef struct {
 ```
 Using the struct that we just created, we can also create the macro peripheral definitions for the GPIOS.
 
-```
+```c
 /*
     Peripheral definitions (Peripheral base addresses typecasted to xxx_RegDef_t)
 */
@@ -150,7 +150,7 @@ Using the 'Table 22. RCC register map and reset values for STM32F401xB/C and STM
 ![image](https://user-images.githubusercontent.com/58916022/207089910-f3c0a1f4-5005-4492-86ef-43d74cdfb512.png)
 ![image](https://user-images.githubusercontent.com/58916022/207089994-eb3ace3a-564e-44fa-ac9e-b150cdcb7025.png)
 
-```
+```c
 /* 
     Peripheral register definition structure for RCC
 */
@@ -200,7 +200,7 @@ typedef struct {
 
 To easy the programming routines, we can create some Macro Functions to quickly initialize the peripherals. This is showed in the following command lines: 
 
-```
+```c
 // Clock Enable Macros for GPIOx peripherals
 #define GPIOA_PCLK_EN() (RCC->AHB1ENR |= (1<<0))
 #define GPIOB_PCLK_EN() (RCC->AHB1ENR |= (1<<1))
@@ -230,7 +230,7 @@ To easy the programming routines, we can create some Macro Functions to quickly 
 
 The same way as showed above, we can create the clock disable macro to ease the disable of peripherals.
 
-```
+```c
 // Clock Disable Macros for GPIOx peripherals
 #define GPIOA_PCLK_DI() (RCC->AHB1ENR &= ~(1<<0))
 #define GPIOB_PCLK_DI() (RCC->AHB1ENR &= ~(1<<1))
@@ -260,7 +260,7 @@ The same way as showed above, we can create the clock disable macro to ease the 
 
 Inside the stm32f401xx.h file, we can create some macros that will be used along the drivers (diffent .h files). Such as:
 
-```
+```c
 // Some generic macros
 #define ENABLE 1
 #define DISABLE 0
@@ -271,7 +271,7 @@ Inside the stm32f401xx.h file, we can create some macros that will be used along
 
 We can create a stm32f401xx_GPIO_driver.h file, to list all the related GPIO macros, structs and funcions, being:
 
-```
+```c
 //@GPIO_PIN_NUMBERS
 #define GPIO_PIN_NO_0 0 
 #define GPIO_PIN_NO_1 1 
@@ -367,7 +367,7 @@ And in the source file (stm32f401xx_GPIO_driver.c), we can copy those same funct
 
 And we can start to write the functions. Let´s begin with the configuration of peripheral clock control.
 
-```
+```c
 /* 
 	write the header for the following function
 */
@@ -401,7 +401,7 @@ void GPIO_PeriClkCtrl(GPIO_RegDef_t *pGPIOx, uint8_t EnOrDi){
 ```
 The following function, initializes the GPIO pin.
 
-```
+```c
 void GPIO_Init(GPIO_Handle t *pGPIOHandle){
 	uint32_t temp =0; // temp. register
 
@@ -458,7 +458,7 @@ void GPIO_Init(GPIO_Handle t *pGPIOHandle){
 ```
 We also need to be able of resetting the port configuration. Observe that the reset function works on the entire port, not being able to reset a single pin.
 
-```
+```c
 void GPIO_DeInit(GPIO_RegDef_t *pGPIOx){
 	if(pGPIOx == GPIOA){
 		GPIOA_REG_RESET();
@@ -485,7 +485,7 @@ To reset the port, the value must go to 1 (being set) and then must return to 0 
 
 ![image](https://user-images.githubusercontent.com/58916022/207434198-92ac033a-e375-481e-ac39-8d404cf07c33.png)
 
-```
+```c
 #define GPIOA_REG_RESET() do { (RCC->AHB1RSTR |= (1<<0)); (RCC->AHB1RSTR &= ~(1<<0)); } while(0)
 #define GPIOB_REG_RESET() do { (RCC->AHB1RSTR |= (1<<1)); (RCC->AHB1RSTR &= ~(1<<1)); } while(0)
 #define GPIOC_REG_RESET() do { (RCC->AHB1RSTR |= (1<<2)); (RCC->AHB1RSTR &= ~(1<<2)); } while(0)
@@ -500,7 +500,7 @@ Quando implementar, checar nome das funções, explicar e comentar o que for nec
 
 Reading functions
 
-```
+```c
 //Reading functions
 
 uint8_t GPIO_Read (GPIO_RegDef_t *pGPIOx, uint8_t PinNumber){
@@ -519,7 +519,7 @@ uint16_t GPIO_PortRead (GPIO_RegDef_t *pGPIOx){
 
 Writting functions
 
-```
+```c
 // Writting functions
 
 void GPIO_Out(GPIO_RegDef_t *pGPIOx, uint8_t GPIO_PinNumber, uint8_t Value){
@@ -571,7 +571,7 @@ Same thing happens when you are writting a function. It's really helpful since t
 
 Final code:
 
-```
+```c
 #include "stm32f401xx.h"
 
 void delay(void){
@@ -610,7 +610,7 @@ To configure the internal pull-up resistor, just change the 'GPIO_PinPuPdControl
 ![image](https://user-images.githubusercontent.com/58916022/208123463-2ea6ad0d-cf50-4752-8911-1e66c2862a13.png)
 
 Final code:
-```
+```c
 #include "stm32f401xx.h"
 
 void delay(void){
@@ -641,7 +641,7 @@ int main (void){
 
 Final code:
 
-```
+```c
 //LD2 = PA5
 //B1 = PC13 with pull-up resistor
 #include "stm32f401xx.h"
